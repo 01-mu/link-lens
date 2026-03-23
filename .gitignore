@@ -6,6 +6,7 @@ node_modules
 .turbo
 dist
 coverage
+*.tsbuildinfo
 .DS_Store
 
 .env
