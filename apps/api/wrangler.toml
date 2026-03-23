@@ -1,0 +1,6 @@
+name = "linklens-api"
+main = "src/index.ts"
+compatibility_date = "2026-03-23"
+
+[observability.logs]
+enabled = true

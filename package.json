@@ -1,0 +1,18 @@
+{
+  "name": "linklens",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev:web": "pnpm --filter @linklens/web dev",
+    "dev:api": "pnpm --filter @linklens/api dev",
+    "build": "pnpm -r --if-present build",
+    "test": "pnpm -r --if-present typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+cloudflare_api_token = "replace-me"
+zone_name            = "example.com"
+worker_name          = "linklens-api"
+api_subdomain        = "api"
+enable_route         = true
