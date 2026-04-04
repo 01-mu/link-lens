@@ -6,13 +6,9 @@
     "apps/*"
   ],
   "scripts": {
-    "prepare": "husky",
     "dev:web": "bun run --filter @linklens/web dev",
     "dev:api": "bun run --filter @linklens/api dev",
     "build": "bun run --workspaces --if-present build",
     "test": "bun run --workspaces --if-present typecheck"
-  },
-  "devDependencies": {
-    "husky": "^9.1.7"
   }
 }
