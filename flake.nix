@@ -17,8 +17,7 @@
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            nodejs_22
-            pnpm
+            bun
             terraform
             wrangler
             git
@@ -27,11 +26,8 @@
           ];
 
           shellHook = ''
-            export PNPM_HOME="$PWD/.pnpm-home"
-            export PATH="$PNPM_HOME:$PATH"
-
             echo "LinkLens dev shell ready."
-            echo "Install dependencies with: pnpm install"
+            echo "Install dependencies with: bun install"
           '';
         };
       });

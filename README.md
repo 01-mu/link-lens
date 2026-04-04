@@ -36,7 +36,7 @@ Enter the reproducible shell with:
 nix develop
 ```
 
-The shell includes `nodejs`, `terraform`, `wrangler`, `git`, `curl`, and `jq`. Install Bun separately if it is not already available in your environment.
+The shell includes `bun`, `terraform`, `wrangler`, `git`, `curl`, and `jq`.
 
 ## Install dependencies
 

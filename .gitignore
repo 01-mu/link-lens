@@ -1,6 +1,4 @@
 node_modules
-.pnpm-store
-.pnpm-home
 .husky/_
 .next
 .nuxt
