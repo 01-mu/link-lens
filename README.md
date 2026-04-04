@@ -30,7 +30,13 @@ linklens/
 
 ## Development shell
 
-Enter the reproducible shell with:
+Use `direnv` to load the flake automatically:
+
+```bash
+direnv allow
+```
+
+Or enter the reproducible shell manually with:
 
 ```bash
 nix develop
