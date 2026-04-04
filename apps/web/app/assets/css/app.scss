@@ -111,29 +111,28 @@ input {
   display: grid;
   gap: 8px;
   margin-top: 32px;
-}
 
-.field span,
-.result-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
+  span {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
 
-.field input {
-  width: 100%;
-  border: 1px solid rgba(23, 32, 51, 0.12);
-  border-radius: 24px;
-  background: rgba(238, 243, 247, 0.82);
-  padding: 16px 20px;
-  outline: none;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
+  input {
+    width: 100%;
+    border: 1px solid rgba(23, 32, 51, 0.12);
+    border-radius: 24px;
+    background: rgba(238, 243, 247, 0.82);
+    padding: 16px 20px;
+    outline: none;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
 
-.field input:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 4px rgba(31, 122, 140, 0.15);
+    &:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(31, 122, 140, 0.15);
+    }
+  }
 }
 
 button[type='submit'] {
@@ -147,15 +146,15 @@ button[type='submit'] {
   font-weight: 700;
   cursor: pointer;
   transition: background 120ms ease, opacity 120ms ease;
-}
 
-button[type='submit']:hover:not(:disabled) {
-  background: var(--teal);
-}
+  &:hover:not(:disabled) {
+    background: var(--teal);
+  }
 
-button[type='submit']:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
 }
 
 .error-banner {
@@ -185,11 +184,11 @@ button[type='submit']:disabled {
   text-align: left;
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
-}
 
-.recent-card:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+  }
 }
 
 .recent-title {
@@ -214,13 +213,13 @@ button[type='submit']:disabled {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
 
-.result-header a {
-  font-weight: 600;
-  color: var(--teal);
-  text-decoration-color: rgba(31, 122, 140, 0.3);
-  text-underline-offset: 4px;
+  a {
+    font-weight: 600;
+    color: var(--teal);
+    text-decoration-color: rgba(31, 122, 140, 0.3);
+    text-underline-offset: 4px;
+  }
 }
 
 .result-grid {
@@ -234,12 +233,19 @@ button[type='submit']:disabled {
   border-radius: 24px;
   background: rgba(247, 241, 232, 0.72);
   padding: 16px;
+
+  a,
+  p {
+    margin: 12px 0 0;
+    word-break: break-word;
+  }
 }
 
-.result-card a,
-.result-card p {
-  margin: 12px 0 0;
-  word-break: break-word;
+.result-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .muted {
@@ -254,7 +260,7 @@ button[type='submit']:disabled {
   color: rgba(23, 32, 51, 0.6);
 }
 
-.panel-dark .empty-state {
+.empty-state-dark {
   border-color: rgba(255, 255, 255, 0.2);
   background: transparent;
   color: rgba(255, 255, 255, 0.6);
@@ -262,52 +268,32 @@ button[type='submit']:disabled {
 
 .empty-state-large {
   margin-top: 32px;
-  padding: 48px 20px;
-  text-align: center;
 }
 
 .image-frame {
-  margin-top: 24px;
   overflow: hidden;
-  border: 1px solid rgba(23, 32, 51, 0.1);
-  border-radius: 32px;
-  background: white;
-}
+  margin-top: 24px;
+  border-radius: 24px;
+  background: rgba(23, 32, 51, 0.06);
 
-.image-frame img {
-  display: block;
-  width: 100%;
-  max-height: 24rem;
-  object-fit: cover;
-}
-
-@media (min-width: 900px) {
-  .page-shell {
-    padding-inline: 24px;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
+}
 
+@media (min-width: 960px) {
   .hero-grid {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  }
-
-  .result-header {
-    align-items: end;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .result-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 899px) {
-  .panel-light,
-  .panel-dark {
-    padding: 24px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+    align-items: start;
   }
 
   h1 {
-    font-size: 2.4rem;
+    font-size: 4rem;
+  }
+
+  h2 {
+    font-size: 2rem;
   }
 }

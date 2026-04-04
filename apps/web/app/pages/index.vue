@@ -1,13 +1,5 @@
 <script setup lang="ts">
-type MetadataRecord = {
-  title: string | null;
-  description: string | null;
-  siteName: string | null;
-  ogImage: string | null;
-  canonical: string | null;
-  favicon: string | null;
-  finalUrl: string;
-};
+import type { MetadataField, MetadataRecord } from '~/types/metadata';
 
 type ApiSuccess = {
   ok: true;
@@ -24,7 +16,7 @@ type ApiError = {
 
 const RECENT_URLS_KEY = 'linklens.recent-urls';
 
-const metadataFields: Array<{ key: keyof MetadataRecord; label: string }> = [
+const metadataFields: MetadataField[] = [
   { key: 'title', label: 'Title' },
   { key: 'description', label: 'Description' },
   { key: 'siteName', label: 'Site name' },
@@ -62,14 +54,6 @@ function isHttpUrl(value: string) {
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
   } catch {
     return false;
-  }
-}
-
-function prettifyHostname(input: string) {
-  try {
-    return new URL(input).hostname.replace(/^www\./, '');
-  } catch {
-    return input;
   }
 }
 
@@ -148,96 +132,10 @@ async function rerunRecent(recentUrl: string) {
 <template>
   <main class="page-shell">
     <section class="hero-grid">
-      <div class="panel panel-light">
-        <p class="eyebrow">LinkLens</p>
-        <h1>Inspect a page before you open ten tabs.</h1>
-        <p class="lede">
-          Paste any URL and LinkLens will fetch the page through the Hono API, inspect the raw
-          HTML, and surface the metadata you actually care about.
-        </p>
-
-        <form class="stack" @submit.prevent="handleSubmit">
-          <label class="field">
-            <span>URL</span>
-            <input
-              v-model="url"
-              type="url"
-              inputmode="url"
-              placeholder="https://example.com"
-            />
-          </label>
-          <button :disabled="isLoading" type="submit">
-            {{ isLoading ? 'Inspecting...' : 'Fetch metadata' }}
-          </button>
-        </form>
-
-        <div v-if="error" class="error-banner">
-          {{ error }}
-        </div>
-      </div>
-
-      <aside class="panel panel-dark">
-        <h2>Recent lookups</h2>
-        <p class="aside-copy">
-          Results are stored in your browser only. Use a recent URL to rerun the lookup quickly.
-        </p>
-
-        <div class="stack recent-list">
-          <button
-            v-for="recentUrl in recentUrls"
-            :key="recentUrl"
-            class="recent-card"
-            type="button"
-            @click="rerunRecent(recentUrl)"
-          >
-            <div class="recent-title">{{ prettifyHostname(recentUrl) }}</div>
-            <div class="recent-url">{{ recentUrl }}</div>
-          </button>
-
-          <div v-if="recentUrls.length === 0" class="empty-state">
-            No recent URLs yet.
-          </div>
-        </div>
-      </aside>
+      <MetadataForm v-model="url" :error="error" :is-loading="isLoading" @submit="handleSubmit" />
+      <RecentLookups :recent-urls="recentUrls" @select="rerunRecent" />
     </section>
 
-    <section class="panel panel-light result-panel">
-      <div class="result-header">
-        <div>
-          <p class="eyebrow">Result</p>
-          <h2>Metadata snapshot</h2>
-        </div>
-        <a v-if="result" :href="result.finalUrl" rel="noreferrer" target="_blank">
-          Open final URL
-        </a>
-      </div>
-
-      <div v-if="result" class="result-grid">
-        <article v-for="{ key, label } in metadataFields" :key="key" class="result-card">
-          <p class="result-label">{{ label }}</p>
-          <a
-            v-if="result[key] && typeof result[key] === 'string' && /^(http|https):\/\//.test(result[key]!)"
-            :href="result[key]!"
-            rel="noreferrer"
-            target="_blank"
-          >
-            {{ result[key] }}
-          </a>
-          <p v-else-if="result[key]">{{ result[key] }}</p>
-          <p v-else class="muted">Not found</p>
-        </article>
-      </div>
-
-      <div v-else class="empty-state empty-state-large">
-        Submit a URL to inspect its metadata.
-      </div>
-
-      <div v-if="result?.ogImage" class="image-frame">
-        <img
-          :alt="result.title ? `${result.title} OG image` : 'Open Graph preview'"
-          :src="result.ogImage"
-        />
-      </div>
-    </section>
+    <MetadataResults :metadata-fields="metadataFields" :result="result" />
   </main>
 </template>
