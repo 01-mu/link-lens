@@ -7,7 +7,7 @@ LinkLens is a small URL metadata viewer built as a monorepo. The web app accepts
 - Nuxt 4 + Vue 3 + Vite for the UI
 - Hono on Cloudflare Workers for the API
 - Zod for request validation
-- Terraform for a small Cloudflare infrastructure slice
+- Terraform in a private submodule for optional Cloudflare routing
 - Nix Flakes for the local development shell
 - Bun workspaces for monorepo management
 
@@ -19,8 +19,7 @@ linklens/
 │  ├─ api/                  # Hono app on Cloudflare Workers
 │  └─ web/                  # Nuxt app
 ├─ infra/
-│  └─ terraform/
-│     └─ cloudflare/        # Cloudflare-side Terraform starter
+│  └─ terraform/            # Private git submodule for Terraform
 ├─ flake.nix
 ├─ package.json
 ├─ bun.lock
@@ -98,18 +97,19 @@ Variables:
 
 ## Terraform
 
-Terraform is intentionally small for v1. Wrangler remains the better tool for building and deploying the Worker code itself, while Terraform is used for optional Cloudflare routing if you want to attach the deployed Worker to a zone route.
+Terraform lives in the private `infra/terraform` git submodule.
 
-Example flow:
+Clone submodules after cloning this repository:
 
 ```bash
-cd infra/terraform/cloudflare
-cp terraform.tfvars.example terraform.tfvars
-terraform init
-terraform plan
+git submodule update --init --recursive
 ```
 
-Required inputs are documented in `terraform.tfvars.example`.
+The Cloudflare Terraform files live under:
+
+```bash
+infra/terraform/cloudflare
+```
 
 ## v1 scope
 
