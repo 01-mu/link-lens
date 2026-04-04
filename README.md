@@ -4,12 +4,12 @@ LinkLens is a small URL metadata viewer built as a monorepo. The web app accepts
 
 ## Stack
 
-- Next.js + TypeScript + Tailwind CSS for the UI
+- Nuxt 4 + Vue 3 + Vite for the UI
 - Hono on Cloudflare Workers for the API
 - Zod for request validation
 - Terraform for a small Cloudflare infrastructure slice
 - Nix Flakes for the local development shell
-- pnpm workspaces for monorepo management
+- Bun workspaces for monorepo management
 
 ## Repository structure
 
@@ -17,13 +17,13 @@ LinkLens is a small URL metadata viewer built as a monorepo. The web app accepts
 linklens/
 ├─ apps/
 │  ├─ api/                  # Hono app on Cloudflare Workers
-│  └─ web/                  # Next.js app
+│  └─ web/                  # Nuxt app
 ├─ infra/
 │  └─ terraform/
 │     └─ cloudflare/        # Cloudflare-side Terraform starter
 ├─ flake.nix
 ├─ package.json
-├─ pnpm-workspace.yaml
+├─ bun.lock
 ├─ tsconfig.base.json
 └─ README.md
 ```
@@ -36,14 +36,14 @@ Enter the reproducible shell with:
 nix develop
 ```
 
-The shell includes `nodejs`, `pnpm`, `terraform`, `wrangler`, `git`, `curl`, and `jq`.
+The shell includes `nodejs`, `terraform`, `wrangler`, `git`, `curl`, and `jq`. Install Bun separately if it is not already available in your environment.
 
 ## Install dependencies
 
 From the repository root:
 
 ```bash
-pnpm install
+bun install
 ```
 
 ## Run locally
@@ -51,13 +51,13 @@ pnpm install
 Start the API:
 
 ```bash
-pnpm dev:api
+bun run dev:api
 ```
 
 Start the web app in another terminal:
 
 ```bash
-pnpm dev:web
+bun run dev:web
 ```
 
 Default local URLs:
@@ -75,7 +75,7 @@ Copy `apps/web/.env.example` to `apps/web/.env.local` and adjust if needed:
 cp apps/web/.env.example apps/web/.env.local
 ```
 
-`NEXT_PUBLIC_API_BASE_URL` points the frontend at the Hono API.
+`NUXT_PUBLIC_API_BASE_URL` points the frontend at the Hono API.
 
 ### API
 

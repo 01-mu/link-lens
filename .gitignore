@@ -1,13 +1,17 @@
 node_modules
 .pnpm-store
 .pnpm-home
+.husky/_
 .next
+.nuxt
+.output
 .wrangler
 .turbo
 dist
 coverage
 *.tsbuildinfo
 .DS_Store
+bun.lock
 
 .env
 .env.local
