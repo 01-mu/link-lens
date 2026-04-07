@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { z } from 'zod';
+import * as v from 'valibot';
 import { fetchMetadata, MetadataFetchError } from './lib/metadata';
 
 const DEFAULT_FETCH_TIMEOUT_MS = 8000;
@@ -16,15 +16,16 @@ type AppContext = {
 
 const app = new Hono<AppContext>();
 
-const requestSchema = z.object({
-  url: z
-    .string()
-    .trim()
-    .url('Enter a valid URL.')
-    .refine((value) => {
+const requestSchema = v.object({
+  url: v.pipe(
+    v.string(),
+    v.trim(),
+    v.url('Enter a valid URL.'),
+    v.check((value) => {
       const parsed = new URL(value);
       return parsed.protocol === 'http:' || parsed.protocol === 'https:';
     }, 'Only http:// and https:// URLs are supported.'),
+  ),
 });
 
 function jsonError(code: string, message: string) {
@@ -66,17 +67,17 @@ app.post('/metadata', async (c) => {
     return c.json(jsonError('INVALID_JSON', 'Request body must be valid JSON.'), 400);
   }
 
-  const parsed = requestSchema.safeParse(json);
+  const parsed = v.safeParse(requestSchema, json);
 
   if (!parsed.success) {
-    const message = parsed.error.issues[0]?.message ?? 'Invalid request body.';
+    const message = parsed.issues[0]?.message ?? 'Invalid request body.';
     return c.json(jsonError('INVALID_URL', message), 400);
   }
 
   const timeoutMs = getFetchTimeoutMs(c.env.FETCH_TIMEOUT_MS);
 
   try {
-    const data = await fetchMetadata(parsed.data.url, timeoutMs);
+    const data = await fetchMetadata(parsed.output.url, timeoutMs);
     return c.json({
       ok: true as const,
       data,
