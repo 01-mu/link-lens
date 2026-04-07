@@ -6,7 +6,8 @@ LinkLens is a small URL metadata viewer built as a monorepo. The web app accepts
 
 - Nuxt 4 + Vue 3 + Vite for the UI
 - Hono on Cloudflare Workers for the API
-- Zod for request validation
+- Valibot for request validation
+- Vitest for tests
 - Terraform in a private submodule for optional Cloudflare routing
 - Nix Flakes for the local development shell
 - Bun workspaces for monorepo management
@@ -17,6 +18,15 @@ LinkLens is a small URL metadata viewer built as a monorepo. The web app accepts
 linklens/
 ├─ apps/
 │  ├─ api/                  # Hono app on Cloudflare Workers
+│  │  ├─ src/
+│  │  │  ├─ features/
+│  │  │  ├─ lib/
+│  │  │  ├─ middleware/
+│  │  │  ├─ routes/
+│  │  │  └─ index.ts
+│  │  └─ tests/
+│  │     ├─ e2e/
+│  │     └─ unit/
 │  └─ web/                  # Nuxt app
 ├─ infra/
 │  └─ terraform/            # Private git submodule for Terraform
@@ -69,6 +79,20 @@ Default local URLs:
 
 - Web: `http://localhost:3000`
 - API: `http://127.0.0.1:8787`
+
+## Test
+
+Run the test suite from the repository root:
+
+```bash
+bun run test
+```
+
+Run workspace typechecks:
+
+```bash
+bun run typecheck
+```
 
 ## Environment variables
 
