@@ -139,3 +139,24 @@ async function rerunRecent(recentUrl: string) {
     <MetadataResults :metadata-fields="metadataFields" :result="result" />
   </main>
 </template>
+
+<style scoped lang="scss">
+.page-shell {
+  width: min(100%, 1200px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+
+.hero-grid {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 960px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+    align-items: start;
+  }
+}
+</style>
