@@ -23,6 +23,8 @@ const LINK_TAG_PATTERN = /<link\b[^>]*>/gi;
 const TITLE_TAG_PATTERN = /<title\b[^>]*>([\s\S]*?)<\/title>/i;
 const ATTRIBUTE_PATTERN =
   /([^\s"'<>/=]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g;
+const HTML_CONTENT_TYPES = ['text/html', 'application/xhtml+xml'];
+const DEFAULT_FAVICON_PATH = '/favicon.ico';
 
 function getHeadChunk(html: string) {
   const headEnd = html.search(/<\/head>/i);
@@ -81,6 +83,10 @@ function resolveUrl(candidate: string | null, baseUrl: string) {
   }
 }
 
+function isHtmlDocument(contentType: string) {
+  return HTML_CONTENT_TYPES.some((type) => contentType.includes(type));
+}
+
 export function extractMetadata(html: string, finalUrl: string): MetadataResult {
   const headChunk = getHeadChunk(html);
   const metaTags = Array.from(headChunk.matchAll(META_TAG_PATTERN), (match) =>
@@ -111,7 +117,7 @@ export function extractMetadata(html: string, finalUrl: string): MetadataResult 
     canonical: resolveUrl(canonicalLink?.get('href') ?? null, finalUrl),
     favicon:
       resolveUrl(faviconLink?.get('href') ?? null, finalUrl) ??
-      new URL('/favicon.ico', finalUrl).toString(),
+      new URL(DEFAULT_FAVICON_PATH, finalUrl).toString(),
     finalUrl,
   };
 }
@@ -138,10 +144,8 @@ export async function fetchMetadata(url: string, timeoutMs: number): Promise<Met
     }
 
     const contentType = response.headers.get('content-type') ?? '';
-    const isHtml =
-      contentType.includes('text/html') || contentType.includes('application/xhtml+xml');
 
-    if (!isHtml) {
+    if (!isHtmlDocument(contentType)) {
       throw new MetadataFetchError(
         'NOT_HTML',
         `Expected an HTML document but received "${contentType || 'unknown content type'}".`,

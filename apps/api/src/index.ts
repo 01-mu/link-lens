@@ -3,12 +3,18 @@ import { cors } from 'hono/cors';
 import { z } from 'zod';
 import { fetchMetadata, MetadataFetchError } from './lib/metadata';
 
+const DEFAULT_FETCH_TIMEOUT_MS = 8000;
+
 type Bindings = {
   CORS_ALLOW_ORIGIN?: string;
   FETCH_TIMEOUT_MS?: string;
 };
 
-const app = new Hono<{ Bindings: Bindings }>();
+type AppContext = {
+  Bindings: Bindings;
+};
+
+const app = new Hono<AppContext>();
 
 const requestSchema = z.object({
   url: z
@@ -31,13 +37,22 @@ function jsonError(code: string, message: string) {
   };
 }
 
-app.use('*', async (c, next) => {
-  const origin = c.env.CORS_ALLOW_ORIGIN ?? '*';
+function getFetchTimeoutMs(value: string | undefined) {
+  const parsed = Number(value ?? String(DEFAULT_FETCH_TIMEOUT_MS));
+  return Number.isFinite(parsed) ? parsed : DEFAULT_FETCH_TIMEOUT_MS;
+}
+
+function applyCors(origin: string) {
   return cors({
     origin,
     allowHeaders: ['Content-Type'],
     allowMethods: ['GET', 'POST', 'OPTIONS'],
-  })(c, next);
+  });
+}
+
+app.use('*', async (c, next) => {
+  const origin = c.env.CORS_ALLOW_ORIGIN ?? '*';
+  return applyCors(origin)(c, next);
 });
 
 app.get('/health', (c) => c.json({ ok: true }));
@@ -58,10 +73,10 @@ app.post('/metadata', async (c) => {
     return c.json(jsonError('INVALID_URL', message), 400);
   }
 
-  const timeoutMs = Number(c.env.FETCH_TIMEOUT_MS ?? '8000');
+  const timeoutMs = getFetchTimeoutMs(c.env.FETCH_TIMEOUT_MS);
 
   try {
-    const data = await fetchMetadata(parsed.data.url, Number.isFinite(timeoutMs) ? timeoutMs : 8000);
+    const data = await fetchMetadata(parsed.data.url, timeoutMs);
     return c.json({
       ok: true as const,
       data,
