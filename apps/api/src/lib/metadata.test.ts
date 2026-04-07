@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractMetadata } from './metadata';
+import { extractMetadata } from '../features/metadata/service';
 
 describe('extractMetadata', () => {
   it('extracts key metadata fields from html', () => {
