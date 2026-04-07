@@ -1,18 +1,6 @@
 <script setup lang="ts">
 import type { MetadataField, MetadataRecord } from '~/types/metadata';
-
-type ApiSuccess = {
-  ok: true;
-  data: MetadataRecord;
-};
-
-type ApiError = {
-  ok: false;
-  error: {
-    code: string;
-    message: string;
-  };
-};
+import type { ApiError, MetadataResponse } from '~/types/api';
 
 const RECENT_URLS_KEY = 'linklens.recent-urls';
 
@@ -26,17 +14,29 @@ const metadataFields: MetadataField[] = [
   { key: 'finalUrl', label: 'Final URL' },
 ];
 
-const config = useRuntimeConfig();
-
 const url = ref('');
+const requestedUrl = ref('');
 const result = ref<MetadataRecord | null>(null);
 const recentUrls = ref<string[]>([]);
 const error = ref<string | null>(null);
-const isLoading = ref(false);
+const requestKey = ref(0);
 
-const apiBaseUrl = computed(() =>
-  (config.public.apiBaseUrl || 'http://127.0.0.1:8787').replace(/\/$/, ''),
-);
+const {
+  data: metadataResponse,
+  error: requestError,
+  status: requestStatus,
+  execute: executeMetadataRequest,
+} = useApi<MetadataResponse>('/metadata', {
+  method: 'POST',
+  immediate: false,
+  watch: false,
+  key: computed(() => `metadata-${requestKey.value}`),
+  body: computed(() => ({
+    url: requestedUrl.value,
+  })),
+});
+
+const isLoading = computed(() => requestStatus.value === 'pending');
 
 useHead({
   title: 'LinkLens',
@@ -59,6 +59,32 @@ function isHttpUrl(value: string) {
 
 function mergeRecentUrls(nextUrl: string, currentUrls: string[]) {
   return [nextUrl, ...currentUrls.filter((candidate) => candidate !== nextUrl)].slice(0, 5);
+}
+
+function getRequestErrorMessage(requestFailure: unknown) {
+  if (requestFailure && typeof requestFailure === 'object') {
+    const payload = (requestFailure as { data?: ApiError }).data;
+
+    if (payload?.ok === false) {
+      return payload.error.message;
+    }
+
+    const message = (requestFailure as { message?: string }).message;
+
+    if (typeof message === 'string' && message.length > 0) {
+      return message;
+    }
+  }
+
+  return 'The metadata request failed.';
+}
+
+function getMetadataResult(payload: MetadataResponse | null) {
+  if (payload?.ok === true) {
+    return payload.data;
+  }
+
+  return null;
 }
 
 onMounted(() => {
@@ -88,34 +114,30 @@ async function submitUrl(nextUrl: string) {
     return;
   }
 
-  isLoading.value = true;
   error.value = null;
+  requestedUrl.value = trimmed;
+  requestKey.value += 1;
 
   try {
-    const response = await fetch(`${apiBaseUrl.value}/metadata`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ url: trimmed }),
-    });
+    await executeMetadataRequest();
 
-    const payload = (await response.json()) as ApiSuccess | ApiError;
-
-    if (!response.ok || !payload.ok) {
-      const message = payload.ok === false ? payload.error.message : 'The metadata request failed.';
-      throw new Error(message);
+    if (requestError.value) {
+      throw new Error(getRequestErrorMessage(requestError.value));
     }
 
-    result.value = payload.data;
+    const metadata = getMetadataResult(metadataResponse.value ?? null);
+
+    if (!metadata) {
+      throw new Error('The metadata request failed.');
+    }
+
+    result.value = metadata;
     recentUrls.value = mergeRecentUrls(trimmed, recentUrls.value);
     window.localStorage.setItem(RECENT_URLS_KEY, JSON.stringify(recentUrls.value));
   } catch (requestError) {
     error.value =
       requestError instanceof Error ? requestError.message : 'The metadata request failed.';
     result.value = null;
-  } finally {
-    isLoading.value = false;
   }
 }
 
