@@ -56,8 +56,7 @@ export const useLinkLensStore = defineStore('linkLens', () => {
     error: requestError,
     status: requestStatus,
     execute: executeMetadataRequest,
-  } = useApi<MetadataResponse>('/metadata', {
-    method: 'POST',
+  } = useApiPost<MetadataResponse>('/metadata', {
     immediate: false,
     watch: false,
     key: computed(() => `metadata-${requestKey.value}`),
